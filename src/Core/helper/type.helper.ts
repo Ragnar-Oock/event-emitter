@@ -1,0 +1,1 @@
+export type OneOrArrayOf<T> = T | T[];

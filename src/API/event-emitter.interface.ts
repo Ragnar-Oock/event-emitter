@@ -2,7 +2,9 @@ import { EventInterface } from "./event.interface";
 
 export type Handler<This extends EventEmitterInterface<EventCollection>, event extends EventInterface> = (this: This, event: event) => void;
 
-export type EventCollection = Record<string, EventInterface>;
+export type EventCollection = {
+    [x: string]: EventInterface;
+};
 
 export type ListenerOptions = {
     /**
@@ -12,8 +14,10 @@ export type ListenerOptions = {
     once: boolean;
 }
 
+export type EventsFromEmitter<Events> = Events extends EventEmitterInterface<infer X> ? X : never
 
-export interface EventEmitterInterface<events extends EventCollection> {
+
+export interface EventEmitterInterface<events extends EventCollection = {}> {
     /**
      * Add an event listener
      */

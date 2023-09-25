@@ -1,4 +1,4 @@
-import type { EventCollection, EventEmitterInterface, Handler, ListenerOptions } from "./event-emitter.interface";
+import type { EventCollection, EventEmitterInterface, Handler, ListenerOptions } from "../API/event-emitter.interface";
 
 export type ListenerObject<events extends EventCollection, eventName extends keyof events> = {
     handler: Handler<EventEmitterInterface<events>, events[eventName]>;

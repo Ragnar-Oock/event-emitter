@@ -1,8 +1,8 @@
-export interface EventInterface<Payload extends Record<string, any> = {}> {
+export interface EventInterface<Payload extends Record<string, any> = any> {
     /**
      * Information caried by the event.
      */
-    payload: Payload;
+    readonly payload: Readonly<Payload>;
     /**
      * Can the default behavior of the event be prevented ?
      * Emulate the way native Events behave.
@@ -21,3 +21,4 @@ export interface EventInterface<Payload extends Record<string, any> = {}> {
      */
     preventDefault(reason?: string): void;
 }
+
