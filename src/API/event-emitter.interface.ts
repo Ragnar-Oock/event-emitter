@@ -2,10 +2,6 @@ import { EventInterface } from "./event.interface";
 
 export type Handler<eventPayload extends any> = (event: EventInterface<eventPayload>) => void;
 
-export type EventCollection<EventPayloads extends Record<string, any>> = {
-    [eventName in keyof EventPayloads]: EventInterface<EventPayloads[eventName]>;
-};
-
 export type ListenerOptions = {
     /**
      * Should the listener be removed after having been invoked once ?
