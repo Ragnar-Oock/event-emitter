@@ -1,22 +1,22 @@
-import type { EventCollection, EventEmitterInterface, Handler, ListenerOptions } from "../API/event-emitter.interface";
+import type { EventEmitterInterface, Handler, ListenerOptions } from "../API/event-emitter.interface";
 
-export type ListenerObject<events extends EventCollection, eventName extends keyof events> = {
-    handler: Handler<EventEmitterInterface<events>, events[eventName]>;
+export type ListenerObject<eventPayload extends any> = {
+    handler: Handler<eventPayload>;
     options?: Partial<ListenerOptions>;
     markedForRemoval: boolean;
 }
-export type ListenerCollection<events extends EventCollection> = {
-    [eventName in keyof events]: ListenerObject<events, eventName>[]
+export type ListenerCollection<events extends Record<string, any>> = {
+    [eventName in keyof events]: ListenerObject<events[eventName]>[]
 };
 
-export default class EventEmitter<events extends EventCollection> implements EventEmitterInterface<events> {
+export default class EventEmitter<events extends Record<string, any>> implements EventEmitterInterface<events> {
     private listeners: Partial<ListenerCollection<events>> = {};
 
     constructor() {
         
     }
 
-    public addEventListener<e extends keyof events>(event: e, handler: Handler<EventEmitterInterface<events>, events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
+    public addEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
         const listeners = this.listeners[event] ?? [];
 
         listeners.push({
@@ -27,7 +27,7 @@ export default class EventEmitter<events extends EventCollection> implements Eve
         return this;
     }
 
-    public removeEventListener<e extends keyof events>(event: e, handler: Handler<EventEmitterInterface<events>, events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
+    public removeEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
         this.listeners[event]
             ?.filter(listener =>
                 listener.handler !== handler && listener.options !== listenerOptions

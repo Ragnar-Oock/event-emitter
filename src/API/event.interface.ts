@@ -1,4 +1,4 @@
-export interface EventInterface<Payload extends Record<string, any> = any> {
+export interface EventInterface<Payload = any> {
     /**
      * Information caried by the event.
      */

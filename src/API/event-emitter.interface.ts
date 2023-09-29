@@ -1,9 +1,9 @@
 import { EventInterface } from "./event.interface";
 
-export type Handler<This extends EventEmitterInterface<EventCollection>, event extends EventInterface> = (this: This, event: event) => void;
+export type Handler<eventPayload extends any> = (event: EventInterface<eventPayload>) => void;
 
-export type EventCollection = {
-    [x: string]: EventInterface;
+export type EventCollection<EventPayloads extends Record<string, any>> = {
+    [eventName in keyof EventPayloads]: EventInterface<EventPayloads[eventName]>;
 };
 
 export type ListenerOptions = {
@@ -17,15 +17,15 @@ export type ListenerOptions = {
 export type EventsFromEmitter<Events> = Events extends EventEmitterInterface<infer X> ? X : never
 
 
-export interface EventEmitterInterface<events extends EventCollection = {}> {
+export interface EventEmitterInterface<events extends Record<string, any> = Record<string, any>> {
     /**
      * Add an event listener
      */
-    addEventListener<e extends keyof events>(event: e, handler: Handler<this, events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
+    addEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
     /**
      * Remove an existing event listener
      */
-    removeEventListener<e extends keyof events>(event: e, handler: Handler<this, events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
+    removeEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
     /**
      * Emit an event for listeners to handler.
      * @param eventName Name of the event to emit.
