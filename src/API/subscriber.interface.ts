@@ -4,7 +4,7 @@ export type Subscribtion<emitter extends EventEmitterInterface> = {
     from: emitter;
     name: Exclude<keyof EventsFromEmitter<emitter>, number|Symbol>;
     action: Handler<EventsFromEmitter<emitter>[keyof EventsFromEmitter<emitter>]>,
-    options: ListenerOptions
+    options?: ListenerOptions
 };
 
 export interface SubscriberInterface {

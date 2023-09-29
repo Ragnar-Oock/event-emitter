@@ -16,7 +16,7 @@ export default class EventEmitter<events extends Record<string, any>> implements
         
     }
 
-    public addEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
+    public addEventListener<e extends (keyof events)|string>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
         const listeners = this.listeners[event] ?? [];
 
         listeners.push({
@@ -27,7 +27,7 @@ export default class EventEmitter<events extends Record<string, any>> implements
         return this;
     }
 
-    public removeEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
+    public removeEventListener<e extends (keyof events)|string>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this {
         this.listeners[event]
             ?.filter(listener =>
                 listener.handler !== handler && listener.options !== listenerOptions
@@ -36,7 +36,7 @@ export default class EventEmitter<events extends Record<string, any>> implements
         return this;
     }
 
-    public emitEvent<e extends keyof events>(eventName: e, event: events[e], defaultBehavior?: (this: this) => void): this {
+    public emitEvent<e extends (keyof events)|string>(eventName: e, event: events[e], defaultBehavior?: (this: this) => void): this {
         this.listeners[eventName]
             ?.forEach(listener => {
                 listener.handler.call(this, event);

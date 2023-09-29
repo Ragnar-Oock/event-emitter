@@ -21,22 +21,22 @@ export interface EventEmitterInterface<events extends Record<string, any> = Reco
     /**
      * Add an event listener
      */
-    addEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
+    addEventListener<e extends (keyof events)|string>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
     /**
      * Remove an existing event listener
      */
-    removeEventListener<e extends keyof events>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
+    removeEventListener<e extends (keyof events)|string>(event: e, handler: Handler<events[e]>, listenerOptions?: Partial<ListenerOptions>): this;
     /**
      * Emit an event for listeners to handler.
      * @param eventName Name of the event to emit.
      * @param event An event object that will be concecutively passed to the handlers and that can hold information.
      */
-    emitEvent<e extends keyof events>(eventName: e, event: events[e]): this;
+    emitEvent<e extends (keyof events)|string>(eventName: e, event: events[e]): this;
     /**
      * Emit an event for listeners to handler.
      * @param eventName Name of the event to emit.
      * @param event An event object that will be concecutively passed to the handlers and that can hold information.
      * @param defaultBehavior The default behavior of the emiter when the emited event happens, this callback is call once all event handlers have been called and if none call {@link EventInterface.preventDefault preventDefault}
      */
-    emitEvent<e extends keyof events>(eventName: e, event: events[e], defaultBehavior?: (this: this) => void): this;
+    emitEvent<e extends (keyof events)|string>(eventName: e, event: events[e], defaultBehavior?: (this: this) => void): this;
 }
