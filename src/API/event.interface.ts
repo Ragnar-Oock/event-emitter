@@ -1,8 +1,10 @@
+import { ImmutableObject } from "../Core/helper/object.helper";
+
 export interface EventInterface<Payload = any> {
     /**
      * Information caried by the event.
      */
-    readonly payload: Readonly<Payload>;
+    readonly payload: ImmutableObject<Payload>;
     /**
      * Can the default behavior of the event be prevented ?
      * Emulate the way native Events behave.
