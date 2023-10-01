@@ -42,8 +42,8 @@ export default class Subscriber implements SubscriberInterface {
         return this;
     }
 
-    private unSubscribeOne<emitter extends EventEmitterInterface>({from, name, action, options}: Subscribtion<emitter>): void {
-        from.removeEventListener(name, action, options);
+    private unSubscribeOne<emitter extends EventEmitterInterface>({from, name, action}: Subscribtion<emitter>): void {
+        from.removeEventListener(name, action);
     }
 
     public unSubscribeAll(): this {
