@@ -51,6 +51,8 @@ export interface EventInterface<EventName extends EventType = EventType, Target 
     /**
      * Does the event bubbles through emitters?
      * The value is set when the event is initialized and cannot be modified.
+     * 
+     * Currently not implemented, it does nothing at the moment but could be handled later.
      */
     readonly bubbles: boolean;
     /**
@@ -63,6 +65,12 @@ export interface EventInterface<EventName extends EventType = EventType, Target 
      */
     readonly defaultPrevented: boolean;
     /**
+     * Does the event propagate in shadow dom ?
+     * 
+     * Currently not implemented, it does nothing at the moment but could be handled later.
+     */
+    readonly composed: boolean;
+    /**
      * The time at which the event was created (in milliseconds). By specification, 
      * this value is time since epoch.
      */
@@ -72,11 +80,51 @@ export interface EventInterface<EventName extends EventType = EventType, Target 
      */
     readonly eventPhase: EVENT_PHASE;
     /**
-     * Has the immediate propagation of the event been prevented ?
+     * Mimicks the native prop.
+     * Will be `true` for events emitted internally by an {@link EventTargetInterface EventTarget},
+     * and `false` for events emitted via it's public {@link dispatchEvent EventTargetInterface.dispatchEvent} method.
+     * 
+     * Just like the native implementation it allows to discriminate between events you know are true and events that might be fabricated. Use with caution.
+     */
+    readonly isTrusted: boolean;
+    /**
+     * alias for {@link stopPropagation stopPropagation()}
+     */
+    cancelBubble: boolean;
+    /**
+     * The result of emitting the event.
+     */
+    returnValue: boolean;
+
+    /**
      * @internal
      */
-    readonly immediatePropagationStoped: boolean;
-    
+    stopPropagationFlag: boolean;
+    /**
+     * @internal
+     */
+    stopImmediatePropagationFlag: boolean;
+    /**
+     * @internal
+     */
+    canceledFlag: boolean;
+    /**
+     * @internal
+     */
+    inPassiveListenerFlag: boolean;
+    /**
+     * @internal
+     */
+    composedFlag: boolean;
+    /**
+     * @internal
+     */
+    initializedFlag: boolean;
+    /**
+     * @internal
+     */
+    dispatchFlag: boolean;
+
     /**
      * Prevents the default behavior of the mecanism that emitted this event.
      */
@@ -95,13 +143,21 @@ export interface EventInterface<EventName extends EventType = EventType, Target 
      * if the event is re-emitted
      */
     composedPath(): SequenceInterface<EventTargetInterface>
+
+    /**
+     * @deprecated use the Event constructor instead.
+     * @param type name of the event to initialize
+     * @param bubbles does the event bubble ?
+     * @param cancelable can the event be canceled ?
+     */
+    initEvent(type: EventName, bubbles: boolean, cancelable: boolean): void
 }
 
 export type EventInit = {
     /**
      * Should the event bubble up the emition chain ?
      * 
-     * Currently not implemented, it does nothing.
+     * Currently not implemented, it does nothing at the moment but could be handled later.
      * @default false;
      */
     bubbles?: boolean;
@@ -115,7 +171,7 @@ export type EventInit = {
     /**
      * Does the event propagate in shadow dom ?
      * 
-     * Not Applicable. Does nothing.
+     * Currently not implemented, it does nothing at the moment but could be handled later.
      * 
      * @default false;
      */

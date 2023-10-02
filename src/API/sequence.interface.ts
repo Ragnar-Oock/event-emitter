@@ -1,4 +1,4 @@
 /**
  * A read only list of items.
  */
-export type SequenceInterface<T> = Readonly<Array<T>>;
+export type SequenceInterface<T> = ReadonlyArray<T>;
