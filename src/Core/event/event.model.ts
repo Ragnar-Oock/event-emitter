@@ -198,7 +198,7 @@ export default class Event<
         return this._isTrusted;
     }
 
-    private static initialize<EventName extends EventType>(event: Event<EventName>, type: EventName, bubbles: boolean, cancelable: boolean): Event<EventName> {
+    protected static initialize<EventName extends EventType>(event: Event<EventName>, type: EventName, bubbles: boolean, cancelable: boolean): Event<EventName> {
         event.initializedFlag = true;
 
         event.stopPropagationFlag = false;

@@ -1,5 +1,5 @@
 import { EventTargetInterface } from "./event-target.interface";
-import { EventInterface, EventType } from "./event.interface";
+import { EventInit, EventInterface, EventType } from "./event.interface";
 
 export interface CustomEventInterface<
     EventName extends EventType = EventType,
@@ -8,7 +8,7 @@ export interface CustomEventInterface<
     Detail = any
     > extends EventInterface<EventName, Target, CurrentTarget> {
 
-    readonly detail: Detail;
+    readonly detail: Detail | null;
 
     /**
      * @deprecated use the CustomEvent constructor instead.
@@ -26,5 +26,5 @@ export type CustomEventInit<Detail = any> = {
      * 
      * @default null;
      */
-    detail: Detail;
-}
+    detail?: Detail;
+} & EventInit;
