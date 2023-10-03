@@ -29,7 +29,11 @@ export enum EVENT_PHASE {
 
 export type EventType = string;
 
-export interface EventInterface<EventName extends EventType = EventType, Target extends EventTargetInterface = EventTargetInterface, CurrentTarget extends EventTargetInterface = EventTargetInterface> {
+export interface EventInterface<
+    EventName extends EventType = EventType,
+    Target extends EventTargetInterface | null = EventTargetInterface,
+    CurrentTarget extends EventTargetInterface | null = EventTargetInterface
+> {
     /**
      * The name identifying the type of the event.
      */

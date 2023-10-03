@@ -5,8 +5,8 @@ import { warn } from "../helper/log.helper";
 
 export default class Event<
     EventName extends EventType,
-    Target extends EventTargetInterface = EventTargetInterface,
-    CurrentTarget extends EventTargetInterface = EventTargetInterface
+    Target extends EventTargetInterface | null = EventTargetInterface,
+    CurrentTarget extends EventTargetInterface | null = EventTargetInterface
     > implements EventInterface<EventName, Target, CurrentTarget> {
         
     private _type: EventName;
@@ -15,8 +15,12 @@ export default class Event<
     private _target: Target | null = null;
     private _currentTarget: CurrentTarget | null = null;
     private _eventPhase: EVENT_PHASE = EVENT_PHASE.NONE;
+
+    /**
+     * No idea how or when to set this to true...
+     */
     private _isTrusted: boolean = false;
-    private readonly _timeStamp: DOMHighResTimeStamp = performance.now();
+    private readonly _timeStamp: DOMHighResTimeStamp;
 
     /**
      * @internal
@@ -48,11 +52,42 @@ export default class Event<
     public dispatchFlag: boolean = false;
 
 
-    constructor(type: EventName, initValues?: EventInit) {
+    constructor(type: EventName, eventInitDict?: EventInit) {
+        // STEP 1 : inner event creation step (this can't be a method because of the readonly nature of {@link _timeStamp} and I don't want to make a getter for it...)
+    
+        // step 1 : Let event be the result of creating a new object using eventInterface. If realm is non-null, then use that realm; otherwise, use the default behavior defined in Web IDL. 
+        // N/A => event is `this`
+
+        // step 2 : Set event’s initialized flag. 
+        this.initializedFlag = true;
+
+        // step 3 : Initialize event’s timeStamp attribute to the relative high resolution coarse time given time and event’s relevant global object. 
+        this._timeStamp = performance.now();
+
+        // step 4 : For each `member → value` in `dictionary`, if event has an attribute whose identifier is `member`, then initialize that attribute to `value`.
+        this._cancelable = eventInitDict?.cancelable ?? false;
+        this._bubbles = eventInitDict?.bubbles ?? false;
+        this.composedFlag = eventInitDict?.composed ?? false;
+
+        // step 5 : Run the event constructing steps with event and dictionary. 
+        this.onConstruct(this as Event<EventName, null, null>, eventInitDict);
+
+        // STEP 2 : Initialize event’s type attribute to type. 
         this._type = type;
-        this._cancelable = initValues?.cancelable ?? false;
-        this._bubbles = initValues?.bubbles ?? false;
-        this.composedFlag = initValues?.composed ?? false;
+
+        // STEP 3 : Return event. 
+        // N/A
+    }
+
+    /**
+     * This method can be used by Event subclasses that have a more complex structure than a simple 1:1 mapping
+     * between their initializing dictionary members and IDL attributes.
+     * 
+     * @param event The event being constructed (event === this)
+     * @param eventInitDict The dictionary object passed as the second parameter of the constructor
+     */
+    protected onConstruct(event: Event<EventName, null, null>, eventInitDict: EventInit | undefined): void {
+        // no-op
     }
 
     /**
