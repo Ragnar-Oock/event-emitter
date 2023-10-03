@@ -8,7 +8,7 @@ export type AddListenerOptions = {
      * 
      * @default false;
      */
-    once: boolean;
+    once?: boolean;
     /**
      * Make the listener passive, i.e. unable to cancel the default behavior of the event it recieves.
      * Much like the native events this can be used to prevent jank or latancy if the listner's handler takes too long to process the event.
@@ -19,13 +19,13 @@ export type AddListenerOptions = {
      * 
      * @default false
      */
-    passive: boolean;
+    passive?: boolean;
     /**
      * The listener will be removed when the given {@link AbortSignal} object's {@link AbortSignal.abort abort()} method is called.
      * If not specified, no AbortSignal is associated with the listener.
      */
-    signal: AbortSignal;
-}
+    signal?: AbortSignal;
+} & EventListenerOptions;
 
 export type EventListenerOptions = {
     /**
@@ -35,7 +35,7 @@ export type EventListenerOptions = {
      * {@link EVENT_PHASE.CAPTURING_PHASE CAPTURING_PHASE}.  
      * Either way, callback will be invoked if event’s eventPhase attribute value is {@link EVENT_PHASE.AT_TARGET AT_TARGET}. 
      */
-    capture: boolean;
+    capture?: boolean;
 }
 
 export type EventCollection = {
@@ -53,13 +53,13 @@ export interface EventTargetInterface<Events extends EventCollection = EventColl
      * or a JavaScript function. See The event listener callback for details on the callback itself. 
      * @param options An object that specifies characteristics about the event listener. See {@link AddListenerOptions} for details on the available options.
      */
-    addEventListener<EventName extends (keyof Events)>(event: EventName, listener: Handler<Events[EventName]>, options?: Partial<AddListenerOptions> | boolean): this;
+    addEventListener<EventName extends (keyof Events)>(event: EventName, listener: Handler<Events[EventName]>, options?: Partial<AddListenerOptions> | boolean): void;
     /**
      * Remove an existing event listener
      * @param event A string which specifies the type of event for which to remove an event listener.
      * @param handler The event listener function of the event handler to remove from the event target.
      */
-    removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options?: Partial<EventListenerOptions> | boolean): this;
+    removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options?: Partial<EventListenerOptions> | boolean): void;
     /**
      * Emit an event for listeners to handler.
      * @param event A fully initialized Event object that will be passed to listeners.

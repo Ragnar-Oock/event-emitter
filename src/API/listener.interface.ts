@@ -14,11 +14,20 @@ export interface ListernerInterface<E extends EventInterface> {
      */
     callback: EventListenerInterface<E> | null;
     /**
+     * Should the listener be reacting in capture, bubble or at target.
+     * 
+     * Not implemented, does nothing
+     */
+    capture: boolean | null;
+    /**
      * is the listener passive ?
+     * @default null
      */
     passive: boolean | null;
     /**
      * should the listener be removed after one call
+     * 
+     * @default false
      */
     once: boolean;
     /**
