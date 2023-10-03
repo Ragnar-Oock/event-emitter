@@ -88,6 +88,9 @@ export default class Event<
      */
     protected onConstruct(event: Event<EventName, null, null>, eventInitDict: EventInit | undefined): void {
         // no-op
+        event = event;
+        // no-op
+        eventInitDict = eventInitDict;
     }
 
     /**
@@ -233,7 +236,7 @@ export default class Event<
         return this._isTrusted;
     }
 
-    protected static initialize<EventName extends EventType>(event: Event<EventName>, type: EventName, bubbles: boolean, cancelable: boolean): Event<EventName> {
+    protected static initialize<EventName extends EventType>(event: Event<EventName, EventTargetInterface | null, EventTargetInterface | null>, type: EventName, bubbles: boolean, cancelable: boolean): Event<EventName, null, EventTargetInterface | null> {
         event.initializedFlag = true;
 
         event.stopPropagationFlag = false;
@@ -248,7 +251,7 @@ export default class Event<
         event._bubbles = bubbles;
         event._cancelable = cancelable;
 
-        return event;
+        return event as Event<EventName, null, EventTargetInterface | null>;
     }
 
     /**
