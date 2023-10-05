@@ -63,6 +63,8 @@ export interface EventTargetInterface<Events extends EventCollection = EventColl
     /**
      * Emit an event for listeners to handler.
      * @param event A fully initialized Event object that will be passed to listeners.
+     * 
+     * @throws {DOMException} InvalidStateError : the event you are trying to dispatch has already been dispatched or is not initialized.
      */
     dispatchEvent<EventName extends (Exclude<keyof Events, number | symbol>)>(event: Events[EventName]): boolean;
 }
