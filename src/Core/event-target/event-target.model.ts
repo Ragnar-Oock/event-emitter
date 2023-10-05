@@ -1,5 +1,5 @@
 import { AddListenerOptions, EventCollection, EventListenerOptions, EventTargetInterface, Handler } from "../../API/event-target.interface";
-import { EventInterface } from "../../API/event.interface";
+import { EventInterface, EventType } from "../../API/event.interface";
 import { ListernerInterface } from "../../API/listener.interface";
 
 export type FlattenedOptions = boolean;
@@ -16,16 +16,57 @@ export default class EventTarget<Events extends EventCollection> implements Even
      * 
      * @see https://dom.spec.whatwg.org/#default-passive-value
      */
-    private readonly defaultPassiveValue = false;
+    private static getDefaultPassiveValue<events extends EventCollection>(_type: EventType, _eventTarget: EventTarget<events>): boolean {
+        return false;
+    };
 
     private eventListenerList: ListernerInterface<Events[keyof Events]>[] = [];
 
     constructor() {}
 
-    public addEventListener<EventName extends (keyof Events)>(event: EventName, listener: Handler<Events[EventName]>, options?: AddListenerOptions | boolean): void {
-        throw new Error("Method not implemented.");
+    private static addAnEventListener<events extends EventCollection>(target: EventTarget<events>, listener: ListernerInterface<events[keyof events]>): void {
+        if (listener.signal !== null && listener.signal.aborted) {
+            return;
+        }
+
+        if (listener.callback === null) {
+            return;
+        }
+
+        listener.passive ??= this.getDefaultPassiveValue(listener.type, target);
+
+        const noExistingListernerIsSimilar = target.eventListenerList.every(existingListener => 
+            existingListener.type !== listener.type &&
+            existingListener.callback !== listener.callback && 
+            existingListener.capture !== listener.capture
+        );
+        if (noExistingListernerIsSimilar) {
+            target.eventListenerList.push(listener);
+        }
+
+        if (listener.signal !== null) {
+            listener.signal.addEventListener('abort', () => this.removeAnEventListner(target, listener));
+        }
     }
-    public removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options?: EventListenerOptions | boolean): void {
+
+    public addEventListener<EventName extends (Exclude<keyof Events, number | symbol>)>(type: EventName, callback: Handler<Events[EventName]> = null, options: AddListenerOptions | boolean = {}): void {
+        const {capture, passive, once, signal} = EventTarget.flattenMoreOptions(options);
+        EventTarget.addAnEventListener(this, {
+            type,
+            callback,
+            capture,
+            passive,
+            once,
+            signal,
+            removed: false
+        })
+    }
+
+    private static removeAnEventListner<events extends EventCollection>(target: EventTarget<events>, listener: ListernerInterface<events[keyof events]>): void {
+        
+    }
+
+    public removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options: EventListenerOptions | boolean = {}): void {
         throw new Error("Method not implemented.");
     }
     public dispatchEvent<EventName extends (keyof Events)>(event: Events[EventName]): boolean {
@@ -41,7 +82,7 @@ export default class EventTarget<Events extends EventCollection> implements Even
         event = event;
     }
 
-    private flattenOptions(options: EventListenerOptions | boolean): FlattenedOptions {
+    private static flattenOptions(options: EventListenerOptions | boolean): FlattenedOptions {
         if (typeof options === 'boolean') {
             return options;
         }
@@ -49,7 +90,7 @@ export default class EventTarget<Events extends EventCollection> implements Even
         return options.capture ?? false;
     }
 
-    private flattenMoreOptions(options: AddListenerOptions | boolean): FlattenedMoreOptions {
+    private static flattenMoreOptions(options: AddListenerOptions | boolean): FlattenedMoreOptions {
         const capture = this.flattenOptions(options);
         let once = false;
         let passive = null;

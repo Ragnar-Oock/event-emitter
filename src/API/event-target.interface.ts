@@ -42,7 +42,7 @@ export type EventCollection = {
     [eventType in EventType]: EventInterface<eventType>
 }
 
-export type Handler<E extends EventInterface> = EventListenerInterface<E> | ((event: E) => void) | null;
+export type Handler<E extends EventInterface> = EventListenerInterface<E> | null;
 
 export interface EventTargetInterface<Events extends EventCollection = EventCollection> {
     /**
@@ -53,16 +53,16 @@ export interface EventTargetInterface<Events extends EventCollection = EventColl
      * or a JavaScript function. See The event listener callback for details on the callback itself. 
      * @param options An object that specifies characteristics about the event listener. See {@link AddListenerOptions} for details on the available options.
      */
-    addEventListener<EventName extends (keyof Events)>(event: EventName, listener: Handler<Events[EventName]>, options?: Partial<AddListenerOptions> | boolean): void;
+    addEventListener<EventName extends (Exclude<keyof Events, number | symbol>)>(event: EventName, listener: Handler<Events[EventName]>, options?: Partial<AddListenerOptions> | boolean): void;
     /**
      * Remove an existing event listener
      * @param event A string which specifies the type of event for which to remove an event listener.
      * @param handler The event listener function of the event handler to remove from the event target.
      */
-    removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options?: Partial<EventListenerOptions> | boolean): void;
+    removeEventListener<EventName extends (Exclude<keyof Events, number | symbol>)>(event: EventName, handler: Handler<Events[EventName]>, options?: Partial<EventListenerOptions> | boolean): void;
     /**
      * Emit an event for listeners to handler.
      * @param event A fully initialized Event object that will be passed to listeners.
      */
-    dispatchEvent<EventName extends (keyof Events)>(event: Events[EventName]): boolean;
+    dispatchEvent<EventName extends (Exclude<keyof Events, number | symbol>)>(event: Events[EventName]): boolean;
 }
