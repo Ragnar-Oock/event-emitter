@@ -89,8 +89,10 @@ export interface EventInterface<
      * and `false` for events emitted via it's public {@link dispatchEvent EventTargetInterface.dispatchEvent} method.
      * 
      * Just like the native implementation it allows to discriminate between events you know are true and events that might be fabricated. Use with caution.
+     * 
+     * @readonly
      */
-    readonly isTrusted: boolean;
+    isTrusted: boolean;
     /**
      * alias for {@link stopPropagation stopPropagation()}
      */

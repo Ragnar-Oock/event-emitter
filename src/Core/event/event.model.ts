@@ -50,7 +50,7 @@ export default class Event<
      * @internal
      */
     public dispatchFlag: boolean = false;
-
+    
 
     constructor(type: EventName, eventInitDict?: EventInit) {
         // STEP 1 : inner event creation step (this can't be a method because of the readonly nature of {@link _timeStamp} and I don't want to make a getter for it...)
@@ -234,6 +234,13 @@ export default class Event<
      */
     public get isTrusted(): boolean {
         return this._isTrusted;
+    }
+
+    /**
+     * @internal
+     */
+    public set isTrusted(value: boolean) {
+        this._isTrusted = value;
     }
 
     protected static initialize<EventName extends EventType>(event: Event<EventName, EventTargetInterface | null, EventTargetInterface | null>, type: EventName, bubbles: boolean, cancelable: boolean): Event<EventName, null, EventTargetInterface | null> {
