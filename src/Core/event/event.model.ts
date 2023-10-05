@@ -51,6 +51,11 @@ export default class Event<
      */
     public dispatchFlag: boolean = false;
     
+    /**
+     * @internal
+     */
+    public relatedTarget: EventTargetInterface | null = null;
+
 
     constructor(type: EventName, eventInitDict?: EventInit) {
         // STEP 1 : inner event creation step (this can't be a method because of the readonly nature of {@link _timeStamp} and I don't want to make a getter for it...)

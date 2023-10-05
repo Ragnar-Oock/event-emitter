@@ -132,6 +132,12 @@ export interface EventInterface<
     dispatchFlag: boolean;
 
     /**
+     * @internal
+     * @default null
+     */
+    relatedTarget: EventTargetInterface | null;
+
+    /**
      * Prevents the default behavior of the mecanism that emitted this event.
      */
     preventDefault(): void;
