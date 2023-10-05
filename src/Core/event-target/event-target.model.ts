@@ -86,18 +86,92 @@ export default class EventTarget<Events extends EventCollection> implements Even
             EventTarget.removeAnEventListener(this, listener);
         }
     }
+
     public dispatchEvent<EventName extends (keyof Events)>(event: Events[EventName]): boolean {
-        throw new Error("Method not implemented.");
+        if (event.dispatchFlag === true || event.initializedFlag === false) {
+            throw new DOMException('InvalidStateError');
+        }
+
+        event.isTrusted = false;
+
+        return EventTarget.dispatch(this, event);
     }
 
-    protected getParent(): EventTargetInterface | null {
+    /**
+     * The spec defines an additional `legacyTargetOverrideFlag` but it is only used in cases outside the 
+     * bounds of this library to enable mecanismes that can't be emulated by this library.
+     */
+    private static dispatch<events extends EventCollection>(target: EventTarget<events>, event: events[keyof events], legacyOutputDidListenersThrowFlag = false): boolean {
+        event.dispatchFlag = true;
+        /**
+         * The spec's definition of this step is a bit more complexe, but for the purpose of this lib it can be simplified to that.
+         * 
+         * @see https://dom.spec.whatwg.org/#dispatching-events
+         */
+        let targetOverride = target;
+
+        let activationTarget: EventTarget<events> | null = null;
+        let relatedTarget: EventTarget<events> = retarget(event.relatedTarget, target);
+
+        if (target !== relatedTarget || target === event.relatedTarget) {
+            // step 1 : Let touchTargets be a new list. 
+            // N/A
+
+            // step 2 : For each touchTarget of event’s touch target list,
+            //          append the result of retargeting touchTarget against target to touchTargets. 
+            // N/A
+
+            // step 3 : Append to an event path with event, target, targetOverride, relatedTarget, 
+            //          touchTargets, and false. 
+            appendToEventPath(event, target, targetOverride, relatedTarget, [], false);
+
+            // step 4 : Let isActivationEvent be true, if event is a MouseEvent object and event’s type 
+            //          attribute is "click"; otherwise false. 
+            // simplified
+            let isActivationEvent = false;
+
+            if (isActivationEvent && target.activationBehavior !== null) {
+                activationTarget = target;
+            }
+
+            // step 6 : Let slottable be target, if target is a slottable and is assigned, and null otherwise. 
+            // simplified
+
+            // step 7 : Let slot-in-closed-tree be false. 
+            // simplified
+
+            let parent = target.getParent(event);
+
+            // step 9 : While parent is non-null
+            // step 9.1 : If slottable is non-null
+            // step 9.1.1 : Assert: parent is a slot. 
+            // step 9.1.2 : Set slottable to null.
+            // step 9.1.3 : If parent’s root is a shadow root whose mode is "closed", then set slot-in-closed-tree to true
+            // step 9.2 : If parent is a slottable and is assigned, then set slottable to parent.
+            // step 9.3 : Let relatedTarget be the result of retargeting event’s relatedTarget against parent. 
+            // step 9.4 : Let touchTargets be a new list. 
+            // step 9.5 : For each touchTarget of event’s touch target list, append the result of retargeting touchTarget against parent to touchTargets. 
+            // step 9.6 : If parent is a Window object, or parent is a node and target’s root is a shadow-including inclusive ancestor of parent.
+            // step 9.6.1 : If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent. 
+            // step 9.6.2 : Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree. 
+            // step 9.7 : Otherwise, if parent is relatedTarget, then set parent to null
+            // step 9.8 : Otherwise, set target to parent and then:
+            // step 9.8.1 : If isActivationEvent is true, activationTarget is null, and target has activation behavior, then set activationTarget to target. 
+            // step 9.8.2 : Append to an event path with event, parent, target, relatedTarget, touchTargets, and slot-in-closed-tree. 
+            // step 9.9 : If parent is non-null, then set parent to the result of invoking parent’s get the parent with event. 
+            // step 9.10 : Set slot-in-closed-tree to false. 
+
+
+            
+        }
+
+    }
+
+    protected getParent(_event: EventInterface): EventTargetInterface | null {
         return null;
     }
 
-    protected activationBehavior(event: EventInterface<Exclude<keyof Events, number | symbol>>): void {
-        // no-op
-        event = event;
-    }
+    protected activationBehavior: ((event: EventInterface<Exclude<keyof Events, number | symbol>>) => {}) | null = null;
 
     private static flattenOptions(options: EventListenerOptions | boolean): FlattenedOptions {
         if (typeof options === 'boolean') {
