@@ -45,7 +45,7 @@ export default class EventTarget<Events extends EventCollection> implements Even
         }
 
         if (listener.signal !== null) {
-            listener.signal.addEventListener('abort', () => this.removeAnEventListner(target, listener));
+            listener.signal.addEventListener('abort', () => this.removeAnEventListener(target, listener));
         }
     }
 
@@ -62,12 +62,29 @@ export default class EventTarget<Events extends EventCollection> implements Even
         })
     }
 
-    private static removeAnEventListner<events extends EventCollection>(target: EventTarget<events>, listener: ListernerInterface<events[keyof events]>): void {
-        
+    private static removeAnEventListener<events extends EventCollection>(target: EventTarget<events>, listener: ListernerInterface<events[keyof events]>): void {
+        listener.removed = true;
+        target.eventListenerList = target
+            .eventListenerList
+            .filter(existingListener => existingListener === listener);
     }
 
-    public removeEventListener<EventName extends (keyof Events)>(event: EventName, handler: Handler<Events[EventName]>, options: EventListenerOptions | boolean = {}): void {
-        throw new Error("Method not implemented.");
+    private static removeAllEventListener(target: EventTarget<EventCollection>): void {
+        target.eventListenerList
+            .forEach(listener => this.removeAnEventListener(target, listener));
+    }
+
+    public removeEventListener<EventName extends (keyof Events)>(type: EventName, callback: Handler<Events[EventName]>, options: EventListenerOptions | boolean = {}): void {
+        const capture = EventTarget.flattenOptions(options);
+
+        const listener = this.eventListenerList.find(listener => 
+            listener.type == type &&
+            listener.callback == callback && 
+            listener.capture == capture
+        );
+        if (typeof listener !== "undefined") {
+            EventTarget.removeAnEventListener(this, listener);
+        }
     }
     public dispatchEvent<EventName extends (keyof Events)>(event: Events[EventName]): boolean {
         throw new Error("Method not implemented.");
